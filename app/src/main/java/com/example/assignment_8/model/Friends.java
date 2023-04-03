@@ -1,18 +1,33 @@
 package com.example.assignment_8.model;
 
+import android.graphics.Bitmap;
+
 import java.io.Serializable;
 
 public class Friends implements Serializable {
     private String name;
     private String email;
+    private String image;
+
 
     public Friends() {
     }
 
-    public Friends(String name, String email) {
+    public Friends(String name, String email, String image) {
         this.name = name;
         this.email = email;
+        this.image = image;
+
     }
+
+    public String getImage() {
+        return image;
+    }
+
+    public void setImage(String image) {
+        this.image = image;
+    }
+
 
     public String getName() {
         return name;
@@ -31,6 +46,6 @@ public class Friends implements Serializable {
     }
 
     public String toString(){
-        return name + " " + email;
+        return name + " " + email + " " + image + " ";
     }
 }

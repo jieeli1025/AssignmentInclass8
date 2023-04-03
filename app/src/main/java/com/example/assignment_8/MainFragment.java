@@ -1,5 +1,6 @@
 package com.example.assignment_8;
 
+import android.graphics.Bitmap;
 import android.os.Bundle;
 
 import androidx.annotation.NonNull;
@@ -12,6 +13,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.ImageView;
 
 import com.example.assignment_8.model.Friends;
 import com.example.assignment_8.model.FriendsAdapter;
@@ -40,6 +42,8 @@ public class MainFragment extends Fragment {
     private FirebaseFirestore db;
     private FirebaseAuth mAuth;
     private FirebaseUser mUser;
+    private ImageView profileImage;
+
     public MainFragment() {
         // Required empty public constructor
     }
@@ -60,7 +64,7 @@ public class MainFragment extends Fragment {
         if (args != null) {
             if (args.containsKey(ARG_FRIENDS)) {
                 mFriends = (ArrayList<Friends>) args.getSerializable(ARG_FRIENDS);
-                Log.d("main fragment - initial friends data", mFriends.toString());
+                Log.d("demo: main fragment - initial friends data", mFriends.toString());
             }
         } else {
             mFriends = new ArrayList<>(); // initialize the mFriends ArrayList here
@@ -76,9 +80,9 @@ public class MainFragment extends Fragment {
 
 
     private void loadData() {
-        Log.d("loading", "loadData: ");
+        Log.d("demo: loading", "loadData: ");
         ArrayList<Friends> friends = new ArrayList<>();
-        Log.d("Main fragment - users got back ", mUser.getUid());
+        Log.d("demo: Main fragment - users got back ", mUser.getUid());
         db.collection("users")
                 .document("authenticatedUsers")
                 .collection("friends")
@@ -86,14 +90,24 @@ public class MainFragment extends Fragment {
                     @Override
                     public void onComplete(@NonNull Task<QuerySnapshot> task) {
                         if(task.isSuccessful()){
+                            String profileimagefromfirebase = "";
                             for(QueryDocumentSnapshot documentSnapshot: task.getResult()){
 //
                                 Friends friend = documentSnapshot.toObject(Friends.class);
-                                Log.d("MainFragment: friend snapshot received back from firebase", friend.toString());
+                                Log.d("demo: MainFragment: friend snapshot received back from firebase", friend.toString());
                                 friends.add(friend);
+                                if (mUser.getUid().equals(friend.getEmail())){
+                                    profileimagefromfirebase = friend.getImage();
+                                    Log.d("demo: MainFragment: profile image from firebase", profileimagefromfirebase);
+                                }
+
+
 
                             }
                             updateRecyclerView(friends);
+                            // get Bitmap from firebase storage and set it to profileImage
+
+                          // profileImage.setImageResource(friends.get());
                         }
                     }
                 });
@@ -103,7 +117,7 @@ public class MainFragment extends Fragment {
 
     public void updateRecyclerView(ArrayList<Friends> friends){
         this.mFriends = friends;
-        Log.d("Main fragment - updating recyler view ", mFriends.toString());
+        Log.d("Demo Main fragment - updating recyler view ", mFriends.toString());
         recyclerViewLayoutManager = new LinearLayoutManager(getContext());
         friendsAdapter = new FriendsAdapter(mFriends, getContext());
         recyclerView.setLayoutManager(recyclerViewLayoutManager);
@@ -117,6 +131,7 @@ public class MainFragment extends Fragment {
         getActivity().setTitle("Main");
         View rootView =  inflater.inflate(R.layout.fragment_main, container, false);
 
+        profileImage = rootView.findViewById(R.id.mainProfileImage);
         Button logoutButton = rootView.findViewById(R.id.logoutButton);
         logoutButton.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -124,6 +139,7 @@ public class MainFragment extends Fragment {
                 mListener.onLogoutButtonClicked();
             }
         });
+
 
 
 
