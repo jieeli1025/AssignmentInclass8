@@ -1,17 +1,20 @@
 package com.example.assignment_8;
 
 import android.content.Context;
+import android.graphics.Bitmap;
 import android.os.Bundle;
 
 import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
 
+import android.util.Base64;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ImageView;
 import android.widget.Toast;
 
 import com.example.assignment_8.model.Friends;
@@ -25,6 +28,8 @@ import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.auth.UserProfileChangeRequest;
 import com.google.firebase.firestore.FirebaseFirestore;
 
+import java.io.ByteArrayOutputStream;
+
 /**
  * A simple {@link Fragment} subclass.
  * Use the {@link RegisterFragment#newInstance} factory method to
@@ -33,6 +38,7 @@ import com.google.firebase.firestore.FirebaseFirestore;
 public class RegisterFragment extends Fragment implements View.OnClickListener{
 
     private FirebaseAuth mAuth;
+    private ImageView profileImage;
     private FirebaseUser mUser;
     private EditText editTextName, editTextEmail, editTextPassword, editTextRepPassword;
     private Button buttonRegister;
@@ -66,11 +72,13 @@ public class RegisterFragment extends Fragment implements View.OnClickListener{
         super.onAttach(context);
         if (context instanceof IregisterFragmentAction){
             this.mListener = (IregisterFragmentAction) context;
-        }else{
+        } else{
             throw new RuntimeException(context.toString()
                     + "must implement RegisterRquest");
         }
     }
+
+
 
 
     @Override
@@ -84,7 +92,24 @@ public class RegisterFragment extends Fragment implements View.OnClickListener{
         editTextPassword = rootView.findViewById(R.id.registerEditPassword);
         editTextRepPassword = rootView.findViewById(R.id.repeatedPassword);
         buttonRegister = rootView.findViewById(R.id.registerFragmentButton);
+        profileImage = rootView.findViewById(R.id.profileImage);
+        if (profileImage != null) {
+            profileImage.setImageBitmap(MainActivity.imageBitmap);
+        }
+
         buttonRegister.setOnClickListener(this);
+
+
+        profileImage.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                // go to CameraControl activity
+                mListener.registerToCamera();
+
+
+            }
+        });
+
 
         return rootView;
     }
@@ -110,13 +135,20 @@ public class RegisterFragment extends Fragment implements View.OnClickListener{
             if(!rep_password.equals(password)){
                 Toast.makeText(getActivity(), "Password must match", Toast.LENGTH_SHORT).show();
             }
+            if (password.length() < 6){
+                Toast.makeText(getActivity(), "Password must be at least 6 characters", Toast.LENGTH_SHORT).show();
+            }
+            if (MainActivity.imageBitmap == null){
+                Toast.makeText(getActivity(), "Please select a profile image", Toast.LENGTH_SHORT).show();
+            }
 
 //            Validation complete.....
             if(!name.equals("") && !email.equals("")
                     && !password.equals("")
                     && rep_password.equals(password)){
                 mUser = mAuth.getCurrentUser();
-                Friends newFriend = new Friends(name, email);
+                Friends newFriend = new Friends(name, email, MainActivity.imageBitmap.toString());
+                Log.d("demo: Register fragment newfriend object ", newFriend.toString());
                 addToFirebase(newFriend);
 
                 // Firebase authentication: Create user.......
@@ -125,7 +157,7 @@ public class RegisterFragment extends Fragment implements View.OnClickListener{
                             @Override
                             public void onComplete(@NonNull Task<AuthResult> task) {
                                 if(task.isSuccessful()){
-                                    Log.d("register fragment", "successfully registered ");
+                                    Log.d("demo register fragment", "successfully registered ");
                                     mUser = task.getResult().getUser();
 //                                    Adding name to the FirebaseUser...
                                     UserProfileChangeRequest profileChangeRequest = new UserProfileChangeRequest.Builder()
@@ -137,7 +169,7 @@ public class RegisterFragment extends Fragment implements View.OnClickListener{
                                                 @Override
                                                 public void onComplete(@NonNull Task<Void> task) {
                                                     if(task.isSuccessful()){
-                                                        Log.d("register fragment", "name added to user");
+                                                        Log.d("demo register fragment", "name added to user");
                                                         mListener.registerDone(mUser);
                                                     }
                                                 }
@@ -151,7 +183,7 @@ public class RegisterFragment extends Fragment implements View.OnClickListener{
                         .addOnFailureListener(new OnFailureListener() {
                             @Override
                             public void onFailure(@NonNull Exception e) {
-                                Log.d("register fragment failed", e.toString());
+                                Log.d("demo register fragment failed", e.toString());
                             }
                         });
 
@@ -170,18 +202,22 @@ public class RegisterFragment extends Fragment implements View.OnClickListener{
                 .addOnSuccessListener(new OnSuccessListener<Void>() {
                     @Override
                     public void onSuccess(Void unused) {
-                        Log.d("register fragment: friends added", "friends added");
+                        Log.d("demo register fragment: friends added", "friends added");
                     }
                 })
                 .addOnFailureListener(new OnFailureListener() {
                     @Override
                     public void onFailure(@NonNull Exception e) {
-                        Log.d("FAILED TO ADD A FRIEND", String.valueOf(e));
+                        Log.d("demo FAILED TO ADD A FRIEND", String.valueOf(e));
                     }
                 });
     }
 
+
+
+
     public interface IregisterFragmentAction {
         void registerDone(FirebaseUser mUser);
+        void registerToCamera();
     }
 }
