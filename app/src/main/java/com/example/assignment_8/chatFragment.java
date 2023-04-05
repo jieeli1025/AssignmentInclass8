@@ -51,6 +51,7 @@ public class chatFragment extends Fragment {
     private RecyclerView recyclerView;
     private String chatCount = "a";
     private ChatAdapter chatAdapter;
+    private Button buttonPhotos;
     private RecyclerView.LayoutManager recyclerViewLayoutManager;
     private Friends friend;
 
@@ -77,6 +78,8 @@ public class chatFragment extends Fragment {
         chatArray = new ArrayList<>();
         db = FirebaseFirestore.getInstance();
         mAuth = FirebaseAuth.getInstance();
+        mUser = mAuth.getCurrentUser();
+        Log.d("chatfragment my currentuser mUser;", mUser.getEmail());
 
         loadchat();
     }
@@ -125,6 +128,7 @@ public class chatFragment extends Fragment {
                              Bundle savedInstanceState) {
         View rootView = inflater.inflate(R.layout.fragment_chat, container, false);
         recyclerView = rootView.findViewById(R.id.chatRecyclerVieww);
+        buttonPhotos = rootView.findViewById(R.id.cameraButton);
         recyclerViewLayoutManager = new LinearLayoutManager(getContext());
         chatAdapter = new ChatAdapter(chatArray);
         recyclerView.setLayoutManager(recyclerViewLayoutManager);
@@ -134,6 +138,16 @@ public class chatFragment extends Fragment {
         EditText editText = rootView.findViewById(R.id.EditChat);
         Button sendButton = rootView.findViewById(R.id.editChatButton);
         Button backButton = rootView.findViewById(R.id.backButton);
+
+        buttonPhotos.setOnClickListener(
+                new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        mListener.chattophotos(mUser);
+                    }
+                }
+        );
+
         backButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -236,5 +250,6 @@ public class chatFragment extends Fragment {
 
     public interface backpressed{
         void BackPressed();
+        void chattophotos(FirebaseUser mUser);
     }
 }

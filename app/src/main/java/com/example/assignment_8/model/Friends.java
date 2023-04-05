@@ -7,25 +7,25 @@ import java.io.Serializable;
 public class Friends implements Serializable {
     private String name;
     private String email;
-    private String image;
+    private String imagetime;
 
 
     public Friends() {
     }
 
-    public Friends(String name, String email, String image) {
+    public Friends(String name, String email, String imagetime) {
         this.name = name;
         this.email = email;
-        this.image = image;
+        this.imagetime = imagetime;
 
     }
 
     public String getImage() {
-        return image;
+        return imagetime;
     }
 
-    public void setImage(String image) {
-        this.image = image;
+    public void setImage(String imagetime) {
+        this.imagetime = imagetime;
     }
 
 
@@ -46,6 +46,6 @@ public class Friends implements Serializable {
     }
 
     public String toString(){
-        return name + " " + email + " " + image + " ";
+        return name + " " + email + " " + imagetime + " ";
     }
 }

@@ -10,4 +10,7 @@
     <string name="send">Send</string>
     <string name="logOut">Log Out</string>
     <string name="back">Back</string>
+    <string name="update">Update</string>
+    <string name="fromImage">Photos</string>
+    <string name="sendd">Send</string>
 </resources>

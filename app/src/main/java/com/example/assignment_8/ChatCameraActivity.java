@@ -11,21 +11,36 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.ImageView;
 
-public class CameraControl extends AppCompatActivity {
+import com.example.assignment_8.model.Friends;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
+
+public class ChatCameraActivity extends AppCompatActivity {
 
     private ImageView imageCamera;
-    private Button bthCamera, saveImage;
+    private Button bthCamera, sendImage;
     private final int CAMERA_REQUEST_CODE = 100;
     private Bitmap bitmap;
+
+    private FirebaseUser mUser;
+    private FirebaseAuth mAuth;
+    private Friends friends;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_camera);
+        setContentView(R.layout.activity_chat_camera);
 
         imageCamera = findViewById(R.id.chatimageCamera);
         bthCamera = findViewById(R.id.chatbuttonTakePicture);
-        saveImage = findViewById(R.id.chatSendImage);
+        sendImage = findViewById(R.id.chatSendImage);
+
+        Intent intent = getIntent();
+
+        mUser = intent.getExtras().getParcelable("currentUser");
+        friends = intent.getExtras().getParcelable("friends");
+
+        Log.d("muser in chat camera", mUser.getEmail());
 
         bthCamera.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -35,14 +50,20 @@ public class CameraControl extends AppCompatActivity {
             }
         });
 
-        saveImage.setOnClickListener(new View.OnClickListener() {
+        sendImage.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Intent toMainthenRegister = new Intent();
-                toMainthenRegister.putExtra("image", bitmap);
-                setResult(RESULT_OK, toMainthenRegister);
-                finish();
+                Intent toMainthenChat = new Intent(ChatCameraActivity.this, MainActivity.class);
+                toMainthenChat.putExtra("chat", bitmap);
+                toMainthenChat.putExtra("currentUser", mUser);
+                toMainthenChat.putExtra("friends", friends);
+                setResult(RESULT_OK, toMainthenChat);
+                // go back to the main activity
+                startActivity(toMainthenChat);
+
             }
+
+
         });
 
 
@@ -55,6 +76,7 @@ public class CameraControl extends AppCompatActivity {
         if (resultCode == RESULT_OK) {
             if (requestCode == CAMERA_REQUEST_CODE) {
                 bitmap = (Bitmap) data.getExtras().get("data");
+
                 Log.d("bitmap", bitmap.toString());
                 imageCamera.setImageBitmap(bitmap);
             }

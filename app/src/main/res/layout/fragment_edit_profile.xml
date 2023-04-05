@@ -5,39 +5,15 @@
     android:id="@+id/frameLayout"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".RegisterFragment" >
+    tools:context=".EditProfileFragment" >
 
-    <EditText
-        android:id="@+id/registerEditPassword"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="32dp"
-        android:ems="10"
-        android:hint="Password"
-        android:inputType="textPassword"
-        app:layout_constraintEnd_toEndOf="@+id/registerEditEmail"
-        app:layout_constraintHorizontal_bias="0.0"
-        app:layout_constraintStart_toStartOf="@+id/registerEditEmail"
-        app:layout_constraintTop_toBottomOf="@+id/registerEditEmail" />
 
     <Button
         android:id="@+id/editupdateButton"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="24dp"
-        android:text="@string/register"
-        app:layout_constraintEnd_toEndOf="@+id/repeatedPassword"
-        app:layout_constraintStart_toStartOf="@+id/repeatedPassword"
-        app:layout_constraintTop_toBottomOf="@+id/repeatedPassword" />
-
-    <EditText
-        android:id="@+id/registerEditEmail"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="32dp"
-        android:ems="10"
-        android:hint="Email"
-        android:inputType="textEmailAddress"
+        android:layout_marginTop="44dp"
+        android:text="@string/update"
         app:layout_constraintEnd_toEndOf="@+id/EditTextName"
         app:layout_constraintStart_toStartOf="@+id/EditTextName"
         app:layout_constraintTop_toBottomOf="@+id/EditTextName" />
@@ -46,7 +22,7 @@
         android:id="@+id/EditTextName"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="56dp"
+        android:layout_marginTop="68dp"
         android:ems="10"
         android:hint="Name"
         android:inputType="textPersonName"
@@ -54,19 +30,6 @@
         app:layout_constraintHorizontal_bias="0.497"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/EditprofileImage" />
-
-    <EditText
-        android:id="@+id/repeatedPassword"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="32dp"
-        android:ems="10"
-        android:hint="Repeat Password"
-        android:inputType="textPassword"
-        app:layout_constraintEnd_toEndOf="@+id/registerEditPassword"
-        app:layout_constraintStart_toStartOf="@+id/registerEditPassword"
-        app:layout_constraintTop_toBottomOf="@+id/registerEditPassword" />
-
 
     <ImageView
         android:id="@+id/EditprofileImage"
@@ -81,12 +44,15 @@
 
     <TextView
         android:id="@+id/updateProfileText"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="24dp"
-        android:text="Please take your profile picture first"
+        android:layout_width="212dp"
+        android:layout_height="37dp"
+        android:layout_marginTop="40dp"
+        android:includeFontPadding="false"
+        android:text="Update Profile"
+        android:textSize="24sp"
         android:textStyle="bold"
         app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.577"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 

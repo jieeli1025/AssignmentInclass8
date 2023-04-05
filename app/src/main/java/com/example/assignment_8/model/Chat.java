@@ -4,15 +4,15 @@ import java.io.Serializable;
 
 public class Chat implements Serializable {
     private String message;
-    private int type;
+    private String time;
     private String sender;
 
     public Chat() {
     }
 
-    public Chat(String message, int type, String sender) {
+    public Chat(String message, String time, String sender) {
         this.message = message;
-        this.type = type;
+        this.time = time;
         this.sender = sender;
     }
 
@@ -24,12 +24,12 @@ public class Chat implements Serializable {
         this.sender = sender;
     }
 
-    public int getType() {
-        return type;
+    public String getTime() {
+        return time;
     }
 
-    public void setType(int type) {
-        this.type = type;
+    public void setType(String time) {
+        this.time = time;
     }
 
     public String getMessage() {
@@ -43,7 +43,7 @@ public class Chat implements Serializable {
     public String toString(){
         return "Chat{" +
                 "message='" + message + '\'' +
-                ", type=" + type +
+                ", type=" + time +
                 ", sender='" + sender + '\'' +
                 '}';
     }

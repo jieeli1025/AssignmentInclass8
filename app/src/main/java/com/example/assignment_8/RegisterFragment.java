@@ -4,10 +4,12 @@ import android.content.Context;
 import android.graphics.Bitmap;
 import android.os.Bundle;
 
+import com.google.firebase.storage.FirebaseStorage;
+import com.google.firebase.storage.StorageReference;
+
 import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
 
-import android.util.Base64;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -27,8 +29,12 @@ import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.auth.UserProfileChangeRequest;
 import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.storage.UploadTask;
 
 import java.io.ByteArrayOutputStream;
+import java.text.SimpleDateFormat;
+import java.util.Date;
+import java.util.Locale;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -38,6 +44,9 @@ import java.io.ByteArrayOutputStream;
 public class RegisterFragment extends Fragment implements View.OnClickListener{
 
     private FirebaseAuth mAuth;
+
+    String fileName;
+
     private ImageView profileImage;
     private FirebaseUser mUser;
     private EditText editTextName, editTextEmail, editTextPassword, editTextRepPassword;
@@ -87,12 +96,12 @@ public class RegisterFragment extends Fragment implements View.OnClickListener{
         // Inflate the layout for this fragment
         getActivity().setTitle("Register Acccount");
         View rootView = inflater.inflate(R.layout.fragment_register, container, false);
-        editTextName = rootView.findViewById(R.id.registerEditTextName);
+        editTextName = rootView.findViewById(R.id.EditTextName);
         editTextEmail = rootView.findViewById(R.id.registerEditEmail);
         editTextPassword = rootView.findViewById(R.id.registerEditPassword);
         editTextRepPassword = rootView.findViewById(R.id.repeatedPassword);
-        buttonRegister = rootView.findViewById(R.id.registerFragmentButton);
-        profileImage = rootView.findViewById(R.id.profileImage);
+        buttonRegister = rootView.findViewById(R.id.editupdateButton);
+        profileImage = rootView.findViewById(R.id.EditprofileImage);
         if (profileImage != null) {
             profileImage.setImageBitmap(MainActivity.imageBitmap);
         }
@@ -121,7 +130,7 @@ public class RegisterFragment extends Fragment implements View.OnClickListener{
         this.password = String.valueOf(editTextPassword.getText()).trim();
         this.rep_password = String.valueOf(editTextRepPassword.getText()).trim();
 
-        if(view.getId()== R.id.registerFragmentButton){
+        if(view.getId()== R.id.editupdateButton){
 //            Validations........
             if(name.equals("")){
                 Toast.makeText(getActivity(), "Name must not be empty!", Toast.LENGTH_SHORT).show();
@@ -142,14 +151,20 @@ public class RegisterFragment extends Fragment implements View.OnClickListener{
                 Toast.makeText(getActivity(), "Please select a profile image", Toast.LENGTH_SHORT).show();
             }
 
+
+
 //            Validation complete.....
             if(!name.equals("") && !email.equals("")
                     && !password.equals("")
                     && rep_password.equals(password)){
+                SimpleDateFormat formatter = new SimpleDateFormat("yyyy_MM_dd_HH_mm_ss", Locale.CANADA);
+                Date now = new Date();
+                fileName = formatter.format(now);
+
                 mUser = mAuth.getCurrentUser();
-                Friends newFriend = new Friends(name, email, MainActivity.imageBitmap.toString());
-                Log.d("demo: Register fragment newfriend object ", newFriend.toString());
-                addToFirebase(newFriend);
+                Friends newFriend = new Friends(name, email, fileName);
+                Log.d("demo: Register fragment new friend object ", newFriend.toString());
+
 
                 // Firebase authentication: Create user.......
                 mAuth.createUserWithEmailAndPassword(email, password)
@@ -187,10 +202,33 @@ public class RegisterFragment extends Fragment implements View.OnClickListener{
                             }
                         });
 
-
+                addToFirebase(newFriend);
+                uploadImage();
 
             }
         }
+
+    }
+
+    private void uploadImage(){
+        String uploademail = email.replace("@", "1");
+        StorageReference storageReference = FirebaseStorage.getInstance().getReference("images/"+ uploademail + fileName );
+        ByteArrayOutputStream baos = new ByteArrayOutputStream();
+        MainActivity.imageBitmap.compress(Bitmap.CompressFormat.JPEG, 100, baos);
+        byte[] data = baos.toByteArray();
+        UploadTask uploadTask = storageReference.putBytes(data);
+        uploadTask.addOnFailureListener(new OnFailureListener() {
+            @Override
+            public void onFailure(@NonNull Exception e) {
+                Log.d("demo", "upload failed");
+            }
+        }).addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
+            @Override
+            public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
+                Log.d("demo", "upload success");
+            }
+        });
+
     }
 
     private void addToFirebase(Friends friend) {

@@ -1,6 +1,9 @@
 package com.example.assignment_8;
 
+import android.content.Context;
 import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.net.Uri;
 import android.os.Bundle;
 
 import androidx.annotation.NonNull;
@@ -8,23 +11,37 @@ import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import android.util.Base64;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.ImageView;
+import android.widget.TextView;
 
+import com.bumptech.glide.Glide;
+import com.bumptech.glide.Registry;
+import com.bumptech.glide.annotation.GlideModule;
+import com.bumptech.glide.module.AppGlideModule;
 import com.example.assignment_8.model.Friends;
 import com.example.assignment_8.model.FriendsAdapter;
 import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.OnFailureListener;
+import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.google.firebase.firestore.QuerySnapshot;
+import com.google.firebase.storage.FileDownloadTask;
+import com.google.firebase.storage.FirebaseStorage;
+import com.google.firebase.storage.StorageReference;
 
+import java.io.File;
+import java.io.IOException;
+import java.io.InputStream;
 import java.util.ArrayList;
 
 
@@ -36,6 +53,7 @@ public class MainFragment extends Fragment {
     private RecyclerView recyclerView;
     private OnLogoutButtonClickedListener mListener;
     private FriendsAdapter friendsAdapter;
+    private StorageReference mStorageRef;
     private RecyclerView.LayoutManager recyclerViewLayoutManager;
     //private ArrayList<Friends> mFriends;
 
@@ -43,6 +61,8 @@ public class MainFragment extends Fragment {
     private FirebaseAuth mAuth;
     private FirebaseUser mUser;
     private ImageView profileImage;
+    private TextView profileName;
+    private String timestamp;
 
     public MainFragment() {
         // Required empty public constructor
@@ -64,7 +84,7 @@ public class MainFragment extends Fragment {
         if (args != null) {
             if (args.containsKey(ARG_FRIENDS)) {
                 mFriends = (ArrayList<Friends>) args.getSerializable(ARG_FRIENDS);
-                Log.d("demo: main fragment - initial friends data", mFriends.toString());
+                //Log.d("demo: main fragment - initial friends data", mFriends.toString());
             }
         } else {
             mFriends = new ArrayList<>(); // initialize the mFriends ArrayList here
@@ -72,6 +92,7 @@ public class MainFragment extends Fragment {
             //            Initializing Firebase...
             db = FirebaseFirestore.getInstance();
             mAuth = FirebaseAuth.getInstance();
+        Log.d("MainmAuth", mAuth.toString());
             mUser = mAuth.getCurrentUser();
 
             //            Loading initial data...
@@ -79,10 +100,12 @@ public class MainFragment extends Fragment {
         }
 
 
+
+
     private void loadData() {
         Log.d("demo: loading", "loadData: ");
         ArrayList<Friends> friends = new ArrayList<>();
-        Log.d("demo: Main fragment - users got back ", mUser.getUid());
+   //     Log.d("demo: Main fragment - users got back ", mUser.getUid());
         db.collection("users")
                 .document("authenticatedUsers")
                 .collection("friends")
@@ -90,24 +113,41 @@ public class MainFragment extends Fragment {
                     @Override
                     public void onComplete(@NonNull Task<QuerySnapshot> task) {
                         if(task.isSuccessful()){
-                            String profileimagefromfirebase = "";
+
                             for(QueryDocumentSnapshot documentSnapshot: task.getResult()){
 //
                                 Friends friend = documentSnapshot.toObject(Friends.class);
-                                Log.d("demo: MainFragment: friend snapshot received back from firebase", friend.toString());
+                              //  Log.d("demo: MainFragment: friend snapshot received back from firebase", friend.toString());
                                 friends.add(friend);
-                                if (mUser.getUid().equals(friend.getEmail())){
-                                    profileimagefromfirebase = friend.getImage();
-                                    Log.d("demo: MainFragment: profile image from firebase", profileimagefromfirebase);
-                                }
-
-
+                              if(friend.getEmail().equals(mUser.getEmail())){
+                                  timestamp = friend.getImage();
+                                    profileName.setText(friend.getName());
+                              }
 
                             }
-                            updateRecyclerView(friends);
-                            // get Bitmap from firebase storage and set it to profileImage
 
-                          // profileImage.setImageResource(friends.get());
+                            updateRecyclerView(friends);
+
+                            String replacedemail = mUser.getEmail();
+                            replacedemail = replacedemail.replace("@", "1");
+                            mStorageRef = FirebaseStorage.getInstance().getReference().child("images/"+replacedemail+ timestamp);
+                            Log.d("mstorageRef", mStorageRef.toString());
+
+                            mStorageRef.getDownloadUrl().addOnSuccessListener(new OnSuccessListener<Uri>() {
+                                @Override
+                                public void onSuccess(Uri uri) {
+                                    String imageUrl = uri.toString();
+                                    Glide.with(getContext()).load(imageUrl).into(profileImage);
+                                }
+                            }).addOnFailureListener(new OnFailureListener() {
+                                @Override
+                                public void onFailure(@NonNull Exception e) {
+                                    Log.d("demo: ", "onFailure: unable to get profileimage ");
+                                }
+                            });
+
+
+
                         }
                     }
                 });
@@ -115,9 +155,11 @@ public class MainFragment extends Fragment {
 
     }
 
+
+
     public void updateRecyclerView(ArrayList<Friends> friends){
         this.mFriends = friends;
-        Log.d("Demo Main fragment - updating recyler view ", mFriends.toString());
+        //Log.d("Demo Main fragment - updating recyler view ", mFriends.toString());
         recyclerViewLayoutManager = new LinearLayoutManager(getContext());
         friendsAdapter = new FriendsAdapter(mFriends, getContext());
         recyclerView.setLayoutManager(recyclerViewLayoutManager);
@@ -132,6 +174,8 @@ public class MainFragment extends Fragment {
         View rootView =  inflater.inflate(R.layout.fragment_main, container, false);
 
         profileImage = rootView.findViewById(R.id.mainProfileImage);
+        profileName = rootView.findViewById(R.id.mainNameText);
+
         Button logoutButton = rootView.findViewById(R.id.logoutButton);
         logoutButton.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -140,6 +184,15 @@ public class MainFragment extends Fragment {
             }
         });
 
+
+        profileImage.setOnClickListener(
+                new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        mListener.gotoEditProfile();
+                    }
+                }
+        );
 
 
 
@@ -155,6 +208,8 @@ public class MainFragment extends Fragment {
     }
 
 
+
+
     @Override
     public void onAttach(@NonNull android.content.Context context) {
         super.onAttach(context);
@@ -166,6 +221,7 @@ public class MainFragment extends Fragment {
     }
     public interface OnLogoutButtonClickedListener{
         void onLogoutButtonClicked();
+        void gotoEditProfile();
     }
 
 
