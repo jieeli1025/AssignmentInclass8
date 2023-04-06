@@ -4,17 +4,40 @@ import java.io.Serializable;
 
 public class Chat implements Serializable {
     private String message;
-    private String time;
+    private String image;
     private String sender;
+    private String email;
+
+    private int type;
 
     public Chat() {
     }
 
-    public Chat(String message, String time, String sender) {
+    public Chat(String message, String time, String sender, int type, String email) {
         this.message = message;
-        this.time = time;
+        this.image = image;
         this.sender = sender;
+        this.type = type;
+        this.email = email;
     }
+
+    public String getEmail() {
+        return email;
+    }
+
+    public void setEmail(String email) {
+        this.email = email;
+    }
+
+
+    public int getType() {
+        return type;
+    }
+
+    public void setType(int type) {
+        this.type = type;
+    }
+
 
     public String getSender() {
         return sender;
@@ -24,14 +47,13 @@ public class Chat implements Serializable {
         this.sender = sender;
     }
 
-    public String getTime() {
-        return time;
+    public String getimage() {
+        return image;
     }
 
-    public void setType(String time) {
-        this.time = time;
+    public void setimage(String image) {
+        this.image = image;
     }
-
     public String getMessage() {
         return message;
     }
@@ -41,10 +63,6 @@ public class Chat implements Serializable {
     }
 
     public String toString(){
-        return "Chat{" +
-                "message='" + message + '\'' +
-                ", type=" + time +
-                ", sender='" + sender + '\'' +
-                '}';
+        return message + " " + image + " " + sender + " " + type + " " + email + " ";
     }
 }

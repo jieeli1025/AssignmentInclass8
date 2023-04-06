@@ -23,9 +23,9 @@ public class CameraControl extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_camera);
 
-        imageCamera = findViewById(R.id.chatimageCamera);
-        bthCamera = findViewById(R.id.chatbuttonTakePicture);
-        saveImage = findViewById(R.id.chatSendImage);
+        imageCamera = findViewById(R.id.imageCamera);
+        bthCamera = findViewById(R.id.buttonTakePicture);
+        saveImage = findViewById(R.id.SendImage);
 
         bthCamera.setOnClickListener(new View.OnClickListener() {
             @Override

@@ -17,6 +17,7 @@ import java.util.ArrayList;
 public class FriendsAdapter extends RecyclerView.Adapter<FriendsAdapter.ViewHolder>
 {
 
+    private MycurrentFriend mycurrentFriend;
     private ArrayList<Friends> friends;
     private IfriendsListRecyclerAction mListener;
     public FriendsAdapter(ArrayList<Friends> friends, Context context)
@@ -84,6 +85,7 @@ public class FriendsAdapter extends RecyclerView.Adapter<FriendsAdapter.ViewHold
         holder.getChatButton().setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                MycurrentFriend.getInstance().setSavedData(friends.get(holder.getAdapterPosition()));
                 mListener.chatButtonPressedFromRecyclerView(friends.get(holder.getAdapterPosition()));
             }
         });

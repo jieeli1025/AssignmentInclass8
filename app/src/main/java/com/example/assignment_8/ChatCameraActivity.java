@@ -25,6 +25,7 @@ public class ChatCameraActivity extends AppCompatActivity {
     private FirebaseUser mUser;
     private FirebaseAuth mAuth;
     private Friends friends;
+    private String chatCount;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -39,27 +40,31 @@ public class ChatCameraActivity extends AppCompatActivity {
 
         mUser = intent.getExtras().getParcelable("currentUser");
         friends = intent.getExtras().getParcelable("friends");
+        chatCount = intent.getExtras().getString("chatCount");
 
         Log.d("muser in chat camera", mUser.getEmail());
 
         bthCamera.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Intent intent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
+                Intent intent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE_SECURE);
                 startActivityForResult(intent, CAMERA_REQUEST_CODE);
+                Log.d("camera onlicked button intent ran", "onClick: ");
             }
         });
 
         sendImage.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Intent toMainthenChat = new Intent(ChatCameraActivity.this, MainActivity.class);
+                Intent toMainthenChat = new Intent();
                 toMainthenChat.putExtra("chat", bitmap);
                 toMainthenChat.putExtra("currentUser", mUser);
                 toMainthenChat.putExtra("friends", friends);
+                toMainthenChat.putExtra("chatCount", chatCount);
+
                 setResult(RESULT_OK, toMainthenChat);
                 // go back to the main activity
-                startActivity(toMainthenChat);
+                finish();
 
             }
 
@@ -73,6 +78,7 @@ public class ChatCameraActivity extends AppCompatActivity {
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
+        Log.d("camera on acticviti ", "onActivityResult:");
         if (resultCode == RESULT_OK) {
             if (requestCode == CAMERA_REQUEST_CODE) {
                 bitmap = (Bitmap) data.getExtras().get("data");

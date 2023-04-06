@@ -102,6 +102,7 @@ public class chatFragment extends Fragment {
 
 
                                 Chat chats = documentSnapshot.toObject(Chat.class);
+                                chats.setEmail(mAuth.getCurrentUser().getEmail());
                                 Log.d("ChatFragment: friend snapshot received back from firebase", chats.toString());
                                 ChatArray.add(chats);
                                 chatCount = (documentSnapshot.getId() + "a");
@@ -130,7 +131,7 @@ public class chatFragment extends Fragment {
         recyclerView = rootView.findViewById(R.id.chatRecyclerVieww);
         buttonPhotos = rootView.findViewById(R.id.cameraButton);
         recyclerViewLayoutManager = new LinearLayoutManager(getContext());
-        chatAdapter = new ChatAdapter(chatArray);
+        chatAdapter = new ChatAdapter(chatArray, getContext());
         recyclerView.setLayoutManager(recyclerViewLayoutManager);
         recyclerView.setAdapter(chatAdapter);
 
@@ -143,7 +144,7 @@ public class chatFragment extends Fragment {
                 new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
-                        mListener.chattophotos(mUser);
+                        mListener.chattophotos(mUser, chatCount);
                     }
                 }
         );
@@ -250,6 +251,6 @@ public class chatFragment extends Fragment {
 
     public interface backpressed{
         void BackPressed();
-        void chattophotos(FirebaseUser mUser);
+        void chattophotos(FirebaseUser mUser, String chatCount);
     }
 }

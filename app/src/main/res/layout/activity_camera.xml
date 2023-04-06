@@ -13,21 +13,21 @@
         android:layout_width="400dp"
         android:layout_height="400dp"
         android:scaleType ="fitXY"
-        android:id="@+id/chatimageCamera" />
+        android:id="@+id/imageCamera" />
 
     <Button
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="Open Camera"
         android:layout_marginTop="21dp"
-        android:id="@+id/chatbuttonTakePicture" />
+        android:id="@+id/buttonTakePicture" />
 
     <Button
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="Save"
         android:layout_marginTop="21dp"
-        android:id="@+id/chatSendImage" />
+        android:id="@+id/SendImage" />
 
 
 

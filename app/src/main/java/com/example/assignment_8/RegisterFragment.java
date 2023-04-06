@@ -1,5 +1,6 @@
 package com.example.assignment_8;
 
+import android.app.ProgressDialog;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.os.Bundle;
@@ -10,6 +11,7 @@ import com.google.firebase.storage.StorageReference;
 import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
 
+import android.os.Handler;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -46,6 +48,7 @@ public class RegisterFragment extends Fragment implements View.OnClickListener{
     private FirebaseAuth mAuth;
 
     String fileName;
+    ProgressDialog progressDialog;
 
     private ImageView profileImage;
     private FirebaseUser mUser;
@@ -184,7 +187,20 @@ public class RegisterFragment extends Fragment implements View.OnClickListener{
                                                 @Override
                                                 public void onComplete(@NonNull Task<Void> task) {
                                                     if(task.isSuccessful()){
+                                                        addToFirebase(newFriend);
+                                                        uploadImage();
                                                         Log.d("demo register fragment", "name added to user");
+                                                        progressDialog = new ProgressDialog(getActivity());
+                                                        progressDialog.setTitle("Logging in....");
+                                                        progressDialog.show();
+
+                                                        new Handler().postDelayed(new Runnable() {
+                                                            @Override
+                                                            public void run() {
+                                                                progressDialog.dismiss();
+                                                            }
+                                                        }, 2000);
+
                                                         mListener.registerDone(mUser);
                                                     }
                                                 }
@@ -202,8 +218,8 @@ public class RegisterFragment extends Fragment implements View.OnClickListener{
                             }
                         });
 
-                addToFirebase(newFriend);
-                uploadImage();
+
+
 
             }
         }
